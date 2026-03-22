@@ -1,0 +1,11 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Title: {{ object.title }}</h1>
+<p>Author: {{object.author}}</p>
+{% if book.cover_image %}
+<img src="{{ book.cover_image.url }}" alt="{{ book.title }} cover">
+{% else %}
+<p>No cover image available</p>
+{% endif %}
+{% endblock content %}
