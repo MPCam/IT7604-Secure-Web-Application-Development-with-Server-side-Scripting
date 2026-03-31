@@ -1,8 +1,10 @@
 from django.db import models
 from django.db.models import Q, F
 from django.core.validators import MinValueValidator
+import datetime
 
 # Create your models here.
+
 
 class Department(models.Model):
     department = models.CharField(max_length=20)
@@ -46,14 +48,18 @@ class Appointment(models.Model):
         NO_SHOW = 'NO_SHOW', 'No Show'
         RESCHEDULED = 'RESCHEDULED', 'Rescheduled'
     
+    TIME_SLOTS = [
+        (datetime.time(hour=h), f"{h:02d}:00") for h in range(9, 17)
+    ]
+
     appointment_code = models.CharField(max_length=20, unique=True, help_text='Unique appointment code, for example APT-2026-0001.',)
     patient = models.ForeignKey('Patient', on_delete=models.CASCADE, related_name='appointments',)
     doctor = models.ForeignKey('Doctor', on_delete=models.PROTECT, related_name='appointments',)
     appointment_type = models.CharField(max_length=20, choices=AppointmentType.choices, default=AppointmentType.GENERAL,)
     status = models.CharField(max_length=20, choices=Status.choices, default=Status.SCHEDULED,)
     appointment_date = models.DateField()
-    start_time = models.TimeField()
-    end_time = models.TimeField()
+    start_time = models.TimeField(choices=TIME_SLOTS)
+    end_time = models.TimeField(choices=TIME_SLOTS)
     room_number = models.CharField(max_length=10, blank=True,)
     reasons = models.CharField(max_length=255)
     symptoms = models.TextField(blank=True)
@@ -79,4 +85,4 @@ class Appointment(models.Model):
 
 
     def __str__(self):
-        return f'{self.apointment_code} - {self.patient} with {self.doctor}'
+        return f'{self.appointment_code} - {self.patient} with {self.doctor}'
